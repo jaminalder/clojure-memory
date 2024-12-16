@@ -1,3 +1,3 @@
 (ns com.cljmem.settings)
 
-(def app-name "My Application")
+(def app-name "Clojure Memory")

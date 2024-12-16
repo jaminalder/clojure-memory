@@ -1,26 +1,16 @@
 (ns com.cljmem
   (:require [com.biffweb :as biff]
-            [com.cljmem.email :as email]
-            [com.cljmem.app :as app]
             [com.cljmem.home :as home]
             [com.cljmem.middleware :as mid]
             [com.cljmem.ui :as ui]
-            [com.cljmem.worker :as worker]
-            [com.cljmem.schema :as schema]
             [clojure.test :as test]
             [clojure.tools.logging :as log]
             [clojure.tools.namespace.repl :as tn-repl]
-            [malli.core :as malc]
-            [malli.registry :as malr]
             [nrepl.cmdline :as nrepl-cmd])
   (:gen-class))
 
 (def modules
-  [app/module
-   (biff/authentication-module {})
-   home/module
-   schema/module
-   worker/module])
+  [home/module])
 
 (def routes [["" {:middleware [mid/wrap-site-defaults]}
               (keep :routes modules)]
@@ -43,28 +33,19 @@
   (generate-assets! ctx)
   (test/run-all-tests #"com.cljmem.*-test"))
 
-(def malli-opts
-  {:registry (malr/composite-registry
-              malc/default-registry
-              (apply biff/safe-merge (keep :schema modules)))})
 
 (def initial-system
   {:biff/modules #'modules
-   :biff/send-email #'email/send-email
    :biff/handler #'handler
-   :biff/malli-opts #'malli-opts
    :biff.beholder/on-save #'on-save
    :biff.middleware/on-error #'ui/on-error
-   :biff.xtdb/tx-fns biff/tx-fns
    :com.cljmem/chat-clients (atom #{})})
 
 (defonce system (atom {}))
 
 (def components
   [biff/use-aero-config
-   biff/use-xtdb
    biff/use-queues
-   biff/use-xtdb-tx-listener
    biff/use-htmx-refresh
    biff/use-jetty
    biff/use-chime

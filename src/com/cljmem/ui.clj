@@ -15,7 +15,7 @@
     (str path "?t=" last-modified)
     path))
 
-(defn base [{:keys [::recaptcha] :as ctx} & body]
+(defn base [ctx & body]
   (apply
    biff/base-html
    (-> ctx
@@ -30,9 +30,7 @@
                                      [:script {:src "https://unpkg.com/htmx.org@1.9.12"}]
                                      [:script {:src "https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"}]
                                      [:script {:src "https://unpkg.com/hyperscript.org@0.9.8"}]
-                                     (when recaptcha
-                                       [:script {:src "https://www.google.com/recaptcha/api.js"
-                                                 :async "async" :defer "defer"}])]
+                                     ]
                                     head))))
    body))
 
